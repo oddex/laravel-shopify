@@ -104,7 +104,7 @@ class ApiHelper implements IApiHelper
      * The instance state is reset to the previous state.
      *
      * @param BasicShopifyAPI $api The API instance.
-     * @param Closure         $fn  The function to call.
+     * @param Closure $fn The function to call.
      *
      * @return void
      */
@@ -272,7 +272,7 @@ class ApiHelper implements IApiHelper
      *
      * @throws Exception
      */
-    public function createChargeGraphQL(PlanDetailsTransfer $payload,$discount = []): ResponseAccess
+    public function createChargeGraphQL(PlanDetailsTransfer $payload, $discount = []): ResponseAccess
     {
         $query = '
         mutation appSubscriptionCreate(
@@ -300,10 +300,13 @@ class ApiHelper implements IApiHelper
             }
         }
         ';
-        $price = array_merge([
-            'amount' => $payload->price,
-            'currencyCode' => 'USD',
-        ],$discount);
+        $appRecurringPricingDetails = array_merge([
+            'price' => [
+                'amount' => $payload->price,
+                'currencyCode' => 'USD',
+            ],
+            'interval' => $payload->interval,
+        ], $discount);
         $variables = [
             'name' => $payload->name,
             'returnUrl' => $payload->returnUrl,
@@ -312,10 +315,7 @@ class ApiHelper implements IApiHelper
             'lineItems' => [
                 [
                     'plan' => [
-                        'appRecurringPricingDetails' => [
-                            'price' => $price,
-                            'interval' => $payload->interval,
-                        ],
+                        'appRecurringPricingDetails' => $appRecurringPricingDetails,
                     ],
                 ],
             ],
@@ -478,13 +478,13 @@ class ApiHelper implements IApiHelper
     /**
      * Fire the request using the API instance.
      *
-     * @param ApiMethod $method  The HTTP method.
-     * @param string    $path    The endpoint path.
-     * @param ?array    $payload The optional payload to send to the endpoint.
-     *
-     * @throws RequestException
+     * @param ApiMethod $method The HTTP method.
+     * @param string $path The endpoint path.
+     * @param ?array $payload The optional payload to send to the endpoint.
      *
      * @return array
+     * @throws RequestException
+     *
      */
     protected function doRequest(ApiMethod $method, string $path, array $payload = null)
     {
@@ -504,12 +504,12 @@ class ApiHelper implements IApiHelper
     /**
      * Fire the request using the GraphQL API Instance.
      *
-     * @param string $query   The query of GraphQL
-     * @param array  $payload The option payload to using on the query
-     *
-     * @throws Exception
+     * @param string $query The query of GraphQL
+     * @param array $payload The option payload to using on the query
      *
      * @return array
+     * @throws Exception
+     *
      */
     protected function doRequestGraphQL(string $query, array $payload = []): array
     {
