@@ -300,6 +300,10 @@ class ApiHelper implements IApiHelper
             }
         }
         ';
+        $price = [
+            'amount' => $payload->price,
+            'currencyCode' => 'USD',
+        ];
         $variables = [
             'name' => $payload->name,
             'returnUrl' => $payload->returnUrl,
@@ -309,10 +313,7 @@ class ApiHelper implements IApiHelper
                 [
                     'plan' => [
                         'appRecurringPricingDetails' => [
-                            'price' => [
-                                'amount' => $payload->price,
-                                'currencyCode' => 'USD',
-                            ],
+                            'price' => $price,
                             'interval' => $payload->interval,
                         ],
                     ],
