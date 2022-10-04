@@ -272,7 +272,7 @@ class ApiHelper implements IApiHelper
      *
      * @throws Exception
      */
-    public function createChargeGraphQL(PlanDetailsTransfer $payload): ResponseAccess
+    public function createChargeGraphQL(PlanDetailsTransfer $payload,$discount = []): ResponseAccess
     {
         $query = '
         mutation appSubscriptionCreate(
@@ -300,10 +300,10 @@ class ApiHelper implements IApiHelper
             }
         }
         ';
-        $price = [
+        $price = array_merge([
             'amount' => $payload->price,
             'currencyCode' => 'USD',
-        ];
+        ],$discount);
         $variables = [
             'name' => $payload->name,
             'returnUrl' => $payload->returnUrl,
