@@ -91,18 +91,28 @@ trait AuthController
         $shopDomain = ShopDomain::fromRequest($request);
         $target = $request->query('target');
         $query = parse_url($target, PHP_URL_QUERY);
+        $host = $request->query('host');
 
         $cleanTarget = $target;
         if ($query) {
             // remove "token" from the target's query string
             $params = Util::parseQueryString($query);
             $params['shop'] = $params['shop'] ?? $shopDomain->toNative() ?? '';
+            $host = $params['host'];
             unset($params['token']);
 
             $cleanTarget = trim(explode('?', $target)[0].'?'.http_build_query($params), '?');
         } else {
             $params = ['shop' => $shopDomain->toNative() ?? ''];
             $cleanTarget = trim(explode('?', $target)[0].'?'.http_build_query($params), '?');
+        }
+
+        if (!$request->has('host') && empty($request->get('host'))) {
+            if (!empty($host)) {
+                $request->merge(['host' => $host]);
+
+                $shop_domain = base64_decode($host);
+            }
         }
 
         return View::make(
