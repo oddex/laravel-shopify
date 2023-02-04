@@ -24,8 +24,7 @@
                     var Redirect = AppBridge.actions.Redirect;
                     var app = createApp({
                         apiKey: "{{ $apiKey }}",
-                        shopOrigin: "{{ $shopOrigin }}",
-                        host: "{{ $host }}",
+                        host: "{{ \Request::get('host') }}",
                     });
 
                     var redirect = Redirect.create(app);
